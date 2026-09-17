@@ -3,7 +3,8 @@
 Ce dossier contient les 2 premières pages réelles du site (pas juste des maquettes) :
 
 - `index.html` — la page d'accueil
-- `connexion.html` — connexion / inscription (déjà relié à ton projet Firebase my-id-cameroun-8002f)
+- `connexion.html` — connexion / inscription (relié à Firebase my-id-cameroun-8002f)
+- `tableau-de-bord.html` — l'espace personnel de chaque utilisateur connecté
 - `favicon.png` / `favicon.ico` — l'icône du site (ton logo)
 
 ## Mettre le site en ligne (aucune compétence technique requise)
@@ -21,6 +22,13 @@ Dans la Console Firebase (console.firebase.google.com) → ton projet →
 **Authentication** → **Settings** → **Authorized domains** : ajoute l'adresse
 `.vercel.app` que Vercel t'aura donnée. Sinon Firebase refusera les connexions
 depuis ce nouveau nom de domaine.
+
+## Important : activer Firestore
+
+Les profils utilisateurs sont enregistrés dans Firestore. Dans la Console
+Firebase → **Firestore Database** → **Créer une base de données** → mode
+**production** → choisis une région (europe-west par exemple). Sans cette
+étape, la connexion fonctionne mais le profil n'est pas sauvegardé.
 
 ## Ce qui reste à construire
 

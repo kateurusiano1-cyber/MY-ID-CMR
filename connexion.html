@@ -360,6 +360,8 @@
     signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,
     sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
@@ -373,6 +375,30 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Crée le profil de l'utilisateur s'il n'existe pas encore
+  async function ensureProfile(user){
+    try {
+      const ref = doc(db, 'profils', user.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()){
+        await setDoc(ref, {
+          uid: user.uid,
+          email: user.email || '',
+          nom: user.displayName || '',
+          photoURL: user.photoURL || '',
+          telephone: '',
+          region: '',
+          ville: '',
+          role: 'citoyen',
+          creeLe: serverTimestamp()
+        });
+      }
+    } catch (e){
+      console.warn('Profil non enregistré :', e);
+    }
+  }
 
   const authMessage = document.getElementById('authMessage');
   let lastMsg = null;   // { kind:'error'|'key', code, key, arg, type }
@@ -476,6 +502,7 @@
     }
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await ensureProfile(cred.user);
       await sendEmailVerification(cred.user);
       showKey('created', email, 'success');
       document.getElementById('formSignup').reset();
@@ -506,8 +533,9 @@
         renderNotVerified();
         return;
       }
+      await ensureProfile(cred.user);
       showKey('loggedIn', null, 'success');
-      setTimeout(() => window.location.href = "index.html", 1200);
+      setTimeout(() => window.location.href = "tableau-de-bord.html", 1200);
     } catch (err){
       showError(err.code);
     }
@@ -534,8 +562,9 @@
   async function handleGoogleAuth(){
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      await ensureProfile(result.user);
       showKey('googleOk', result.user.email, 'success');
-      setTimeout(() => window.location.href = "index.html", 1200);
+      setTimeout(() => window.location.href = "tableau-de-bord.html", 1200);
     } catch (err){
       showError(err.code);
     }

@@ -356,7 +356,7 @@
         <button>EN</button>
       </div>
       <span class="header-sep"></span>
-      <a href="connexion.html" class="btn btn-ghost">Connexion</a>
+      <a href="connexion.html" class="btn btn-ghost" id="authLink">Connexion</a>
     </div>
   </div>
 
@@ -380,7 +380,7 @@
       <a href="#">Contact</a>
     </nav>
     <div class="mobile-menu-actions">
-      <a href="connexion.html" class="btn btn-gold" style="flex:1; justify-content:center;">Connexion</a>
+      <a href="connexion.html" class="btn btn-gold" style="flex:1; justify-content:center;" id="authLinkMobile">Connexion</a>
       <button class="icon-btn" title="Installer l'application">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/>
@@ -409,7 +409,7 @@
       </div>
 
       <div class="action-cards">
-        <a href="connexion.html" class="action-card lost">
+        <a href="connexion.html" class="action-card lost" data-auth-link>
           <div class="action-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>
           </div>
@@ -417,7 +417,7 @@
           <p>Déclarez la perte en 1 minute pour qu'on vous prévienne dès qu'il est retrouvé.</p>
           <span class="action-arrow">Déclarer une perte <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span>
         </a>
-        <a href="connexion.html" class="action-card found">
+        <a href="connexion.html" class="action-card found" data-auth-link>
           <div class="action-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
@@ -628,6 +628,36 @@
   }
   liveTickerText.style.transition = 'opacity 0.25s ease';
   setInterval(rotateFeed, 7000);
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
+    authDomain: "my-id-cameroun-8002f.firebaseapp.com",
+    projectId: "my-id-cameroun-8002f",
+    storageBucket: "my-id-cameroun-8002f.firebasestorage.app",
+    messagingSenderId: "570156621876",
+    appId: "1:570156621876:web:8e9041c95787980fdf2a61",
+    measurementId: "G-49KW835Q2C"
+  };
+  const auth = getAuth(initializeApp(firebaseConfig));
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) return;
+    const prenom = (user.displayName || (user.email || '').split('@')[0] || '').split(' ')[0];
+    const label = 'Mon espace' + (prenom ? ' · ' + prenom : '');
+    const a = document.getElementById('authLink');
+    if (a){ a.textContent = label; a.href = 'tableau-de-bord.html'; }
+    const m = document.getElementById('authLinkMobile');
+    if (m){ m.textContent = label; m.href = 'tableau-de-bord.html'; }
+    document.querySelectorAll('[data-auth-link]').forEach(el => {
+      el.href = 'tableau-de-bord.html';
+    });
+  });
 </script>
 </body>
 </html>
