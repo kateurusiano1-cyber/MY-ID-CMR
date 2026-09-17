@@ -291,6 +291,7 @@
     document.querySelectorAll('.lang-mini button').forEach(b =>
       b.classList.toggle('active', b.dataset.lang === lang));
     refreshHeadings();
+    if (window.retranslateAuthMessage) window.retranslateAuthMessage();
   }
   document.querySelectorAll('.lang-mini button').forEach(btn => {
     btn.addEventListener('click', () => applyLang(btn.dataset.lang));
@@ -374,11 +375,31 @@
   const auth = getAuth(app);
 
   const authMessage = document.getElementById('authMessage');
+  let lastMsg = null;   // { kind:'error'|'key', code, key, arg, type }
   function showMessage(text, type){
     authMessage.textContent = text;
     authMessage.className = 'auth-message ' + type;
     authMessage.style.display = 'block';
   }
+  function showError(code){
+    lastMsg = { kind:'error', code, type:'error' };
+    showMessage(friendlyError(code), 'error');
+  }
+  function showKey(key, arg, type){
+    lastMsg = { kind:'key', key, arg, type };
+    const v = msg(key);
+    showMessage(typeof v === 'function' ? v(arg) : v, type);
+  }
+  // Retraduit le message affiché quand la langue change
+  window.retranslateAuthMessage = function(){
+    if (!lastMsg) return;
+    if (lastMsg.kind === 'custom') lastMsg.render();
+    else if (lastMsg.kind === 'error') showMessage(friendlyError(lastMsg.code), 'error');
+    else {
+      const v = msg(lastMsg.key);
+      showMessage(typeof v === 'function' ? v(lastMsg.arg) : v, lastMsg.type);
+    }
+  };
   function showMessageHTML(html, type){
     authMessage.innerHTML = html;
     authMessage.className = 'auth-message ' + type;
@@ -393,6 +414,12 @@
       'auth/wrong-password': "Mot de passe incorrect.",
       'auth/invalid-credential': "Email ou mot de passe incorrect.",
       'auth/too-many-requests': "Trop de tentatives. Réessayez dans quelques minutes.",
+      'auth/operation-not-allowed': "La connexion Google n'est pas encore activée dans la console Firebase (Authentication → Sign-in method → Google).",
+      'auth/unauthorized-domain': "Ce domaine n'est pas autorisé dans Firebase. Ajoutez-le dans Authentication → Settings → Authorized domains.",
+      'auth/popup-blocked': "La fenêtre Google a été bloquée par le navigateur. Autorisez les fenêtres surgissantes puis réessayez.",
+      'auth/popup-closed-by-user': "La fenêtre Google a été fermée avant la fin de la connexion.",
+      'auth/cancelled-popup-request': "Une autre fenêtre de connexion est déjà ouverte.",
+      'auth/network-request-failed': "Problème de connexion internet. Vérifiez votre réseau puis réessayez.",
       _default: "Une erreur est survenue. Réessayez.",
       mismatch: "Les deux mots de passe ne sont pas identiques.",
       created: (m) => "Compte créé ! Un email de confirmation vient d'être envoyé à " + m + ". Cliquez sur le lien qu'il contient pour activer votre compte.",
@@ -412,6 +439,12 @@
       'auth/wrong-password': "Incorrect password.",
       'auth/invalid-credential': "Incorrect email or password.",
       'auth/too-many-requests': "Too many attempts. Please try again in a few minutes.",
+      'auth/operation-not-allowed': "Google sign-in is not enabled yet in the Firebase console (Authentication → Sign-in method → Google).",
+      'auth/unauthorized-domain': "This domain is not authorised in Firebase. Add it under Authentication → Settings → Authorized domains.",
+      'auth/popup-blocked': "The Google window was blocked by your browser. Allow pop-ups and try again.",
+      'auth/popup-closed-by-user': "The Google window was closed before sign-in finished.",
+      'auth/cancelled-popup-request': "Another sign-in window is already open.",
+      'auth/network-request-failed': "Network problem. Check your internet connection and try again.",
       _default: "Something went wrong. Please try again.",
       mismatch: "The two passwords do not match.",
       created: (m) => "Account created! A confirmation email has been sent to " + m + ". Click the link inside to activate your account.",
@@ -438,16 +471,16 @@
     const confirm = document.getElementById('signupPasswordConfirm').value;
 
     if (pass !== confirm){
-      showMessage(msg('mismatch'), 'error');
+      showKey('mismatch', null, 'error');
       return;
     }
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       await sendEmailVerification(cred.user);
-      showMessage(msg('created')(email), 'success');
+      showKey('created', email, 'success');
       document.getElementById('formSignup').reset();
     } catch (err){
-      showMessage(friendlyError(err.code), 'error');
+      showError(err.code);
     }
   });
 
@@ -459,20 +492,24 @@
     try {
       const cred = await signInWithEmailAndPassword(auth, email, pass);
       if (!cred.user.emailVerified){
-        showMessageHTML(
-          msg('notVerified') + "<button id='resendBtn' type='button'>" + msg('resendLink') + "</button>.",
-          'error'
-        );
-        document.getElementById('resendBtn').addEventListener('click', async () => {
-          await sendEmailVerification(cred.user);
-          showMessage(msg('resent')(email), 'success');
-        });
+        const renderNotVerified = () => {
+          showMessageHTML(
+            msg('notVerified') + "<button id='resendBtn' type='button'>" + msg('resendLink') + "</button>.",
+            'error'
+          );
+          document.getElementById('resendBtn').addEventListener('click', async () => {
+            await sendEmailVerification(cred.user);
+            showKey('resent', email, 'success');
+          });
+        };
+        lastMsg = { kind:'custom', render: renderNotVerified };
+        renderNotVerified();
         return;
       }
-      showMessage(msg('loggedIn'), 'success');
+      showKey('loggedIn', null, 'success');
       setTimeout(() => window.location.href = "index.html", 1200);
     } catch (err){
-      showMessage(friendlyError(err.code), 'error');
+      showError(err.code);
     }
   });
 
@@ -481,14 +518,14 @@
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     if (!email){
-      showMessage(msg('needEmail'), 'error');
+      showKey('needEmail', null, 'error');
       return;
     }
     try {
       await sendPasswordResetEmail(auth, email);
-      showMessage(msg('resetSent')(email), 'success');
+      showKey('resetSent', email, 'success');
     } catch (err){
-      showMessage(friendlyError(err.code), 'error');
+      showError(err.code);
     }
   });
 
@@ -497,10 +534,10 @@
   async function handleGoogleAuth(){
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      showMessage(msg('googleOk')(result.user.email), 'success');
+      showKey('googleOk', result.user.email, 'success');
       setTimeout(() => window.location.href = "index.html", 1200);
     } catch (err){
-      showMessage(friendlyError(err.code), 'error');
+      showError(err.code);
     }
   }
   document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleAuth);
