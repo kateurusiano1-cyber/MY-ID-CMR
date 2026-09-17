@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="favicon.png">
-<title>MY ID CAMEROUN — Mon tableau de bord</title>
+<title>MY ID CAMEROUN — Aide & support</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -110,16 +110,80 @@
     .profile-actions{ margin-left:0; width:100%; }
     .brand-sub{ display:none; }
   }
+
+  /* ---- Pages internes partagées ---- */
+  .back-arrow{ margin-right:2px; }
+  .page-head{ padding:34px 0 8px; }
+  .page-head h1{ font-family:var(--serif); font-weight:600; font-size:1.6rem; margin:0 0 6px; }
+  .page-head p{ margin:0 0 26px; color:color-mix(in srgb, var(--text) 65%, transparent); font-size:.92rem; }
+
+  .tabs{ display:flex; gap:6px; background:var(--bg-deep); border:1px solid var(--line); border-radius:10px; padding:4px; margin-bottom:24px; width:fit-content; }
+  .tabs button{ border:none; background:none; padding:9px 18px; border-radius:8px; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:.85rem; color:var(--muted); transition:background-color .18s,color .18s; }
+  .tabs button.active{ background:var(--gold); color:#241B04; }
+
+  .empty-state{ text-align:center; padding:60px 24px; background:var(--bg-deep); border:1px dashed var(--line); border-radius:16px; }
+  .empty-state .e-icon{ width:56px; height:56px; margin:0 auto 18px; border-radius:14px; background:color-mix(in srgb, var(--gold) 14%, transparent); color:var(--gold); display:flex; align-items:center; justify-content:center; }
+  .empty-state h3{ font-family:var(--serif); font-weight:600; font-size:1.15rem; margin:0 0 8px; }
+  .empty-state p{ margin:0 0 20px; color:var(--muted); font-size:.9rem; max-width:40ch; margin-left:auto; margin-right:auto; }
+
+  .list-card{ display:flex; align-items:center; gap:16px; background:var(--bg-deep); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; transition:transform .18s,box-shadow .18s,border-color .18s; }
+  .list-card:hover{ transform:translateY(-2px); border-color:color-mix(in srgb, var(--text) 26%, transparent); box-shadow:0 12px 24px rgba(0,0,0,.28); }
+  .list-card .l-icon{ width:42px; height:42px; flex-shrink:0; border-radius:11px; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--gold) 14%, transparent); color:var(--gold); }
+  .list-card .l-body{ flex:1; min-width:0; }
+  .list-card .l-body b{ display:block; font-size:.95rem; }
+  .list-card .l-body span{ font-size:.8rem; color:var(--muted); }
+  .list-card .l-status{ font-size:.68rem; font-weight:700; padding:4px 10px; border-radius:100px; white-space:nowrap; }
+  .l-status.pending{ background:rgba(201,154,46,.16); color:var(--gold); }
+  .l-status.done{ background:rgba(27,115,64,.14); color:#7FCE9A; }
+
+  .panel{ background:var(--bg-deep); border:1px solid var(--line); border-radius:16px; padding:28px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:.78rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .field input, .field select{
+    width:100%; border:1.5px solid var(--line); border-radius:9px; background:color-mix(in srgb, var(--bg) 60%, transparent);
+    padding:11px 13px; font-family:var(--sans); font-size:.92rem; color:var(--text);
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .field input:focus, .field select:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,154,46,.18); }
+  .field input:disabled{ opacity:.55; cursor:not-allowed; }
+  .field-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .field-row .field{ flex:1; min-width:180px; }
+  .save-msg{ font-size:.82rem; margin-top:6px; display:none; }
+  .save-msg.show{ display:block; }
+  .save-msg.ok{ color:#7FCE9A; }
+  .save-msg.err{ color:#E68A92; }
+
+  .search-bar{ display:flex; gap:10px; margin-bottom:26px; flex-wrap:wrap; }
+  .search-bar input, .search-bar select{ background:var(--bg-deep); border:1.5px solid var(--line); border-radius:9px; padding:11px 14px; color:var(--text); font-family:var(--sans); font-size:.9rem; }
+  .search-bar input{ flex:1; min-width:200px; }
+  .search-bar input:focus, .search-bar select:focus{ outline:none; border-color:var(--gold); }
+
+  .faq-item{ border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden; background:var(--bg-deep); }
+  .faq-q{ width:100%; text-align:left; background:none; border:none; color:var(--text); font-family:var(--sans); font-weight:600; font-size:.92rem; padding:16px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .faq-q svg{ flex-shrink:0; transition:transform .2s ease; }
+  .faq-item.open .faq-q svg{ transform:rotate(180deg); }
+  .faq-a{ max-height:0; overflow:hidden; transition:max-height .25s ease; }
+  .faq-a p{ margin:0; padding:0 18px 16px; font-size:.88rem; color:var(--muted); line-height:1.55; }
+  .faq-item.open .faq-a{ max-height:240px; }
+
+  .contact-row{ display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); font-size:.9rem; }
+  .contact-row:last-child{ border-bottom:none; }
+  .contact-row svg{ color:var(--gold); flex-shrink:0; }
+
+  .soon-hero{ text-align:center; padding:70px 24px; }
+  .soon-hero .s-icon{ width:64px; height:64px; margin:0 auto 22px; border-radius:16px; background:color-mix(in srgb, var(--gold) 14%, transparent); color:var(--gold); display:flex; align-items:center; justify-content:center; }
+  .soon-hero h1{ font-family:var(--serif); font-weight:600; font-size:1.6rem; margin:0 0 10px; }
+  .soon-hero p{ margin:0 auto 24px; color:var(--muted); max-width:44ch; }
 </style>
 </head>
 <body>
 
 <div class="loading" id="loading">Chargement de votre espace…</div>
-
+<div class="loading" id="loading">Chargement…</div>
 <div id="app">
 <header>
   <div class="wrap headerbar">
-    <a href="index.html" class="icon-btn back-arrow" title="Retour à l'accueil">
+    <a href="tableau-de-bord.html" class="icon-btn back-arrow" title="Retour au tableau de bord">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
     </a>
     <a class="brand" href="index.html">
@@ -138,115 +202,49 @@
     </div>
   </div>
 </header>
-
 <main class="wrap">
-  <section class="profile-band">
-    <span id="bigAvatar"></span>
-    <div class="profile-info">
-      <h1 id="userName">—</h1>
-      <p id="userEmail">—</p>
-      <div class="chips" id="userChips"></div>
-    </div>
-    <div class="profile-actions">
-      <a href="profil.html" class="btn btn-ghost">Modifier mon profil</a>
-      <a href="declarer.html" class="btn btn-gold">Nouvelle déclaration</a>
-    </div>
-  </section>
 
-  <div class="stat-row">
-    <div class="stat-box"><b>0</b><span>Déclarations actives</span></div>
-    <div class="stat-box"><b>0</b><span>Pièces trouvées signalées</span></div>
-    <div class="stat-box"><b>0</b><span>Documents restitués</span></div>
-    <div class="stat-box"><b>0</b><span>Notifications non lues</span></div>
+  <div class="page-head">
+    <h1>Aide &amp; support</h1>
+    <p>Questions fréquentes et moyens de nous contacter.</p>
   </div>
 
-  <h2>Mon espace</h2>
-  <p class="section-sub">Tout ce que vous pouvez gérer depuis votre compte.</p>
+  <h2 style="font-size:1rem; margin-bottom:14px;">Questions fréquentes</h2>
+  <div class="faq-item">
+      <button type="button" class="faq-q">Comment déclarer un document perdu ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="faq-a"><p>Depuis votre tableau de bord, ouvrez « Mes déclarations de perte », puis cliquez sur « Faire une déclaration ». Renseignez le type de document, le nom qui y figure et la localisation approximative.</p></div>
+    </div>
+<div class="faq-item">
+      <button type="button" class="faq-q">J'ai trouvé un document, que faire ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="faq-a"><p>Ouvrez « Mes pièces trouvées » depuis le tableau de bord et signalez-le de la même façon. Le propriétaire sera averti dès qu'une correspondance est détectée.</p></div>
+    </div>
+<div class="faq-item">
+      <button type="button" class="faq-q">Comment savoir si mon document a été retrouvé ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="faq-a"><p>Consultez « Rechercher un document » pour vérifier vous-même, ou attendez une notification automatique si vous avez déjà fait une déclaration.</p></div>
+    </div>
+<div class="faq-item">
+      <button type="button" class="faq-q">Le paiement de 1000 FCFA est-il obligatoire ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="faq-a"><p>Il ne sera demandé que pour accéder aux coordonnées de récupération une fois une correspondance trouvée. Cette fonctionnalité (paiement IkePay) n'est pas encore activée sur le site.</p></div>
+    </div>
+<div class="faq-item">
+      <button type="button" class="faq-q">Mes informations sont-elles visibles publiquement ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="faq-a"><p>Non. Seuls les citoyens connectés peuvent consulter le registre, et vos coordonnées personnelles restent protégées jusqu'à la mise en relation.</p></div>
+    </div>
 
-  <div class="tiles">
-    <a href="mes-declarations.html" class="tile red">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v3l2 2"/></svg>
-      </div>
-      <h3>Mes déclarations de perte</h3>
-      <p>Suivez l'état des documents que vous avez déclarés perdus.</p>
-    </a>
 
-    <a href="mes-declarations.html?tab=trouve" class="tile green">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-      </div>
-      <h3>Mes pièces trouvées</h3>
-      <p>Les documents que vous avez signalés au registre national.</p>
-    </a>
-
-    <a href="notifications.html" class="tile">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-      </div>
-      <h3>Notifications</h3>
-      <p>Soyez prévenu dès qu'une correspondance est trouvée.</p>
-      <span class="tile-badge">0</span>
-    </a>
-
-    <a href="recherche.html" class="tile">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-      </div>
-      <h3>Rechercher un document</h3>
-      <p>Parcourez le registre national par nom, région ou type de pièce.</p>
-    </a>
-
-    <a href="paiements.html" class="tile">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      </div>
-      <h3>Paiements et reçus</h3>
-      <p>Historique de vos paiements et téléchargement des reçus PDF.</p>
-    </a>
-
-    <a href="profil.html" class="tile">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <h3>Mon profil</h3>
-      <p>Nom, téléphone, région, ville et photo de profil.</p>
-    </a>
-
-    <a href="carte-qr.html" class="tile soon">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-      </div>
-      <h3>Carte virtuelle &amp; QR code</h3>
-      <p>Présentez votre QR code au bureau pour récupérer votre pièce.</p>
-      <span class="tile-badge">Bientôt</span>
-    </a>
-
-    <a href="bureaux.html" class="tile soon">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <h3>Bureaux près de moi</h3>
-      <p>Commissariats et mairies partenaires autour de votre position.</p>
-      <span class="tile-badge">Bientôt</span>
-    </a>
-
-    <a href="aide.html" class="tile">
-      <div class="tile-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg>
-      </div>
-      <h3>Aide &amp; support</h3>
-      <p>Questions fréquentes et contact avec l'équipe.</p>
-    </a>
+  <div class="panel" style="margin-top:28px; max-width:480px;">
+    <h2 style="font-size:1rem;">Nous contacter</h2>
+    <div class="contact-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg> contact@myid-cameroun.cm</div>
+    <div class="contact-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.8 2.2z"/></svg> +237 6XX XXX XXX (WhatsApp)</div>
+    <div class="contact-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V3"/><path d="M4 4h14l-2 4 2 4H4"/></svg> Signaler un abus ou une déclaration suspecte : abus@myid-cameroun.cm</div>
   </div>
+
 </main>
-
-<footer class="wrap">© 2026 MY ID CAMEROUN — Plateforme citoyenne non gouvernementale.</footer>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut }
+  import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
@@ -263,20 +261,20 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  window.__fb = { app, auth, db, sendPasswordResetEmail };
 
   function initials(nameOrEmail){
     const s = (nameOrEmail || '?').trim();
     const parts = s.split(/[\s@._-]+/).filter(Boolean);
     return ((parts[0]?.[0] || '?') + (parts[1]?.[0] || '')).toUpperCase();
   }
+  window.__initials = initials;
 
   onAuthStateChanged(auth, async (user) => {
     if (!user){
       window.location.href = 'connexion.html';
       return;
     }
-
-    // Charge (ou crée) le profil
     let profil = {};
     try {
       const ref = doc(db, 'profils', user.uid);
@@ -294,30 +292,17 @@
 
     const nom = profil.nom || user.displayName || (user.email || '').split('@')[0];
     const photo = profil.photoURL || user.photoURL || '';
-
-    document.getElementById('userName').textContent = nom;
-    document.getElementById('userEmail').textContent = user.email || '';
-
-    const avatarHTML = photo
-      ? `<img class="avatar" src="${photo}" alt="">`
-      : `<span class="avatar-fallback">${initials(nom || user.email)}</span>`;
-    const bigHTML = photo
-      ? `<img class="avatar-lg" src="${photo}" alt="">`
-      : `<span class="avatar-lg-fallback">${initials(nom || user.email)}</span>`;
-    document.getElementById('headAvatar').innerHTML = avatarHTML;
-    document.getElementById('bigAvatar').innerHTML = bigHTML;
-
-    const chips = [];
-    chips.push(user.emailVerified
-      ? '<span class="chip ok">EMAIL VÉRIFIÉ</span>'
-      : '<span class="chip warn">EMAIL NON VÉRIFIÉ</span>');
-    chips.push(`<span class="chip neutral">${(profil.role || 'citoyen').toUpperCase()}</span>`);
-    if (profil.ville || profil.region)
-      chips.push(`<span class="chip neutral">${[profil.ville, profil.region].filter(Boolean).join(', ')}</span>`);
-    document.getElementById('userChips').innerHTML = chips.join('');
+    const headAvatar = document.getElementById('headAvatar');
+    if (headAvatar){
+      headAvatar.innerHTML = photo
+        ? `<img class="avatar" src="${photo}" alt="">`
+        : `<span class="avatar-fallback">${initials(nom || user.email)}</span>`;
+    }
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+
+    if (window.onProfileReady) window.onProfileReady(user, profil);
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -332,5 +317,18 @@
     document.getElementById('themeBtn').innerHTML = isLight ? moonIcon : sunIcon;
   });
 </script>
+
+<script type="module">
+  
+
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.classList.toggle('open');
+    });
+  });
+  window.onProfileReady = () => {};
+
+</script>
+
 </body>
 </html>
