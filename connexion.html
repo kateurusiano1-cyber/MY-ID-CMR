@@ -432,8 +432,7 @@
     signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,
     sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
@@ -447,25 +446,27 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
 
-  // Crée le profil de l'utilisateur s'il n'existe pas encore
+  const supabase = createClient(
+    "https://iwqebdyftmelslbgdkgq.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3cWViZHlmdG1lbHNsYmdka2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODUwMjQsImV4cCI6MjEwNTI2MTAyNH0.E2LbAUoZ7vngBBLToNoVjDaq82dtFw0Ka_xWOeiCUag"
+  );
+
+  // Crée le profil de l'utilisateur s'il n'existe pas encore (table Supabase "profils")
   async function ensureProfile(user, extra){
     extra = extra || {};
     try {
-      const ref = doc(db, 'profils', user.uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()){
-        await setDoc(ref, Object.assign({
+      const { data: existing } = await supabase.from('profils').select('uid').eq('uid', user.uid).maybeSingle();
+      if (!existing){
+        await supabase.from('profils').insert(Object.assign({
           uid: user.uid,
           email: user.email || '',
           nom: user.displayName || '',
-          photoURL: user.photoURL || '',
           telephone: '',
           region: '',
           ville: '',
           role: 'citoyen',
-          creeLe: serverTimestamp()
+          creeLe: new Date().toISOString()
         }, extra));
       }
     } catch (e){

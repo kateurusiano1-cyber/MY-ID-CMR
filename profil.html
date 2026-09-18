@@ -257,8 +257,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
@@ -271,8 +270,11 @@
   };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
-  window.__fb = { app, auth, db, sendPasswordResetEmail };
+  const supabase = createClient(
+    "https://iwqebdyftmelslbgdkgq.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3cWViZHlmdG1lbHNsYmdka2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODUwMjQsImV4cCI6MjEwNTI2MTAyNH0.E2LbAUoZ7vngBBLToNoVjDaq82dtFw0Ka_xWOeiCUag"
+  );
+  window.__fb = { app, auth, supabase, sendPasswordResetEmail };
 
   function initials(nameOrEmail){
     const s = (nameOrEmail || '?').trim();
@@ -288,18 +290,17 @@
     }
     let profil = {};
     try {
-      const ref = doc(db, 'profils', user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) profil = snap.data();
+      const { data } = await supabase.from('profils').select('*').eq('uid', user.uid).maybeSingle();
+      if (data) profil = data;
       else {
         profil = {
           uid:user.uid, email:user.email||'', nom:user.displayName||'',
-          photoURL:user.photoURL||'', telephone:'', region:'', ville:'',
-          role:'citoyen', creeLe:serverTimestamp()
+          telephone:'', region:'', ville:'',
+          role:'citoyen', creeLe:new Date().toISOString()
         };
-        await setDoc(ref, profil);
+        await supabase.from('profils').insert(profil);
       }
-    } catch(e){ console.warn('Firestore indisponible :', e); }
+    } catch(e){ console.warn('Supabase indisponible :', e); }
 
     const nom = profil.nom || user.displayName || (user.email || '').split('@')[0];
     const photo = profil.photoURL || user.photoURL || '';
@@ -332,7 +333,7 @@
 <script type="module">
   
 
-  import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  const supabase = window.__fb.supabase;
 
   let currentUser = null;
   window.onProfileReady = (user, profil) => {
@@ -348,12 +349,13 @@
     e.preventDefault();
     const msg = document.getElementById('profilMsg');
     try {
-      await setDoc(doc(window.__fb.db, 'profils', currentUser.uid), {
+      const { error } = await supabase.from('profils').update({
         nom: document.getElementById('pNom').value.trim(),
         telephone: document.getElementById('pTel').value.trim(),
         region: document.getElementById('pRegion').value,
         ville: document.getElementById('pVille').value.trim()
-      }, { merge: true });
+      }).eq('uid', currentUser.uid);
+      if (error) throw error;
       msg.textContent = 'Profil mis à jour avec succès.';
       msg.className = 'save-msg show ok';
     } catch (err){

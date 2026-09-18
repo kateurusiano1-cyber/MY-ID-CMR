@@ -66,3 +66,13 @@ d'indisponibilité au lieu de fonctionner.
 - OCR (Google Gemini), paiement (IkePay), SMS
 
 On avance une page à la fois — dis-moi laquelle tu veux ensuite.
+
+## Panneau Admin (`admin.html`)
+
+Accessible via le lien discret en bas du tableau de bord. Il est **prêt
+niveau design et fonctionnement**, mais entièrement piloté par Supabase —
+tant que Supabase n'est pas branché, la page s'affiche en « mode
+démonstration » (bannière dorée en haut) et aucune vraie donnée n'apparaît.
+
+Le SQL des tables Supabase à créer, et l'explication pour devenir admin,
+sont donnés directement dans la discussion — pas dans ce fichier.

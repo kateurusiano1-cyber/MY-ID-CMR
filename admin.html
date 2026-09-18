@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="favicon.png">
+<title>MY ID CAMEROUN — Panneau Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F2A3D; --bg-deep:#0A1E2C; --paper:#F5F1E8; --paper-dim:#E9E3D3;
+    --ink:#16232B; --ink-soft:#5B6B72; --text:#F5F1E8; --muted:#7C8A96;
+    --green:#1B7340; --green-soft:#23854A; --red:#C8313D; --gold:#C99A2E;
+    --line:color-mix(in srgb, var(--text) 14%, transparent);
+    --serif:'IBM Plex Serif',Georgia,serif; --sans:'IBM Plex Sans',Arial,sans-serif;
+  }
+  body.light{ --bg:#F2EFE6; --bg-deep:#E7E1D0; --text:#16232B; --muted:#756D5D; }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.5;
+    background-image: radial-gradient(1000px 560px at 90% -10%, rgba(201,154,46,0.08), transparent 60%);
+    transition:background-color .25s ease,color .25s ease;
+  }
+  a{ color:inherit; }
+  img{ max-width:100%; }
+
+  /* Accessibilité : focus toujours visible, quel que soit l'élément */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{
+    outline:2.5px solid var(--gold); outline-offset:2px; border-radius:4px;
+  }
+  .skip-link{
+    position:absolute; left:-999px; top:auto; background:var(--gold); color:#241B04; font-weight:700;
+    padding:10px 18px; border-radius:0 0 8px 0; z-index:100; text-decoration:none;
+  }
+  .skip-link:focus{ left:0; top:0; }
+
+  .layout{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
+
+  /* ---- Sidebar ---- */
+  aside.sidebar{
+    background:var(--bg-deep); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+  }
+  .side-brand{ display:flex; align-items:center; gap:10px; padding:20px 18px; border-bottom:1px solid var(--line); }
+  .side-brand .mark{ width:36px; height:36px; border-radius:8px; border:1.4px solid var(--gold); overflow:hidden; background:var(--bg); flex-shrink:0; }
+  .side-brand .mark img{ width:100%; height:100%; object-fit:cover; transform:scale(1.15); }
+  .side-brand span{ font-family:var(--serif); font-weight:600; font-size:.95rem; }
+  .side-brand small{ display:block; font-size:.66rem; color:var(--muted); font-weight:400; }
+
+  nav.side-nav{ padding:14px 10px; flex:1; overflow-y:auto; }
+  .side-link{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left; background:none; border:none;
+    color:color-mix(in srgb, var(--text) 75%, transparent); font-family:var(--sans); font-size:.88rem; font-weight:600;
+    padding:11px 12px; border-radius:9px; cursor:pointer; margin-bottom:3px; position:relative;
+    transition:background-color .18s ease, color .18s ease;
+  }
+  .side-link svg{ flex-shrink:0; }
+  .side-link:hover{ background:color-mix(in srgb, var(--text) 6%, transparent); color:var(--text); }
+  .side-link[aria-current="page"]{ background:color-mix(in srgb, var(--gold) 16%, transparent); color:var(--gold); }
+  .side-link .count{
+    margin-left:auto; font-size:.68rem; font-weight:700; background:var(--red); color:#fff;
+    border-radius:100px; padding:1px 7px; min-width:18px; text-align:center;
+  }
+  .side-foot{ padding:14px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+
+  /* ---- Top bar + contenu ---- */
+  main{ min-width:0; }
+  .topbar{
+    display:flex; align-items:center; gap:14px; padding:16px 28px; border-bottom:1px solid var(--line);
+    background:color-mix(in srgb, var(--bg-deep) 55%, transparent); backdrop-filter:blur(6px);
+    position:sticky; top:0; z-index:10;
+  }
+  .icon-btn{ width:38px; height:38px; flex-shrink:0; border-radius:8px; cursor:pointer;
+    border:1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
+    background:color-mix(in srgb, var(--gold) 10%, transparent); color:var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    transition:background-color .18s,transform .18s,box-shadow .18s,border-color .18s; }
+  .icon-btn:hover{ background:color-mix(in srgb, var(--gold) 20%, transparent); border-color:var(--gold); transform:translateY(-2px); box-shadow:0 8px 18px rgba(201,154,46,.25); }
+  .topbar h1{ font-family:var(--serif); font-weight:600; font-size:1.15rem; margin:0; }
+  .topbar .sub{ font-size:.78rem; color:var(--muted); margin:0; }
+  .head-actions{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .avatar-fallback{ width:34px; height:34px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem;
+    background:color-mix(in srgb, var(--gold) 18%, transparent); color:var(--gold); }
+  .avatar{ width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--gold); }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; border-radius:9px;
+    font-family:var(--sans); font-weight:600; font-size:.85rem; text-decoration:none; cursor:pointer; border:1px solid transparent;
+    transition:transform .18s,box-shadow .18s,background-color .18s,border-color .18s; }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:active{ transform:translateY(0) scale(.97); }
+  .btn-gold{ background:var(--gold); color:#241B04; }
+  .btn-gold:hover{ background:#DBAE3E; box-shadow:0 10px 24px rgba(201,154,46,.32); }
+  .btn-ghost{ border-color:color-mix(in srgb, var(--gold) 45%, var(--line)); background:color-mix(in srgb, var(--gold) 8%, transparent); color:var(--text); }
+  .btn-ghost:hover{ background:color-mix(in srgb, var(--gold) 16%, transparent); border-color:var(--gold); }
+  .btn-danger{ border-color:color-mix(in srgb, var(--red) 45%, var(--line)); background:color-mix(in srgb, var(--red) 10%, transparent); color:#E68A92; }
+  .btn-danger:hover{ background:color-mix(in srgb, var(--red) 18%, transparent); border-color:var(--red); }
+  .btn-sm{ padding:7px 12px; font-size:.78rem; }
+
+  .content{ padding:28px; max-width:1180px; }
+  .panel-section{ display:none; }
+  .panel-section.active{ display:block; }
+  .section-head{ margin-bottom:22px; }
+  .section-head h2{ font-family:var(--serif); font-weight:600; font-size:1.3rem; margin:0 0 5px; }
+  .section-head p{ margin:0; color:var(--muted); font-size:.88rem; }
+
+  /* ---- Cartes stats ---- */
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:30px; }
+  .stat-box{ background:var(--bg-deep); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .stat-box b{ display:block; font-family:var(--serif); font-size:1.7rem; }
+  .stat-box span{ font-size:.76rem; color:var(--muted); }
+  .stat-box.warn b{ color:var(--gold); }
+
+  /* ---- Filtres ---- */
+  .filters{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+  .filters input, .filters select{
+    background:var(--bg-deep); border:1.5px solid var(--line); border-radius:9px; padding:9px 13px;
+    color:var(--text); font-family:var(--sans); font-size:.85rem;
+  }
+  .filters input{ flex:1; min-width:180px; }
+  .filters label{ font-size:.78rem; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+
+  /* ---- Tableaux ---- */
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--bg-deep); }
+  table{ width:100%; border-collapse:collapse; font-size:.85rem; min-width:640px; }
+  caption{ caption-side:top; text-align:left; padding:14px 16px 0; font-size:.78rem; color:var(--muted); }
+  thead th{ text-align:left; padding:12px 16px; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--muted); border-bottom:1px solid var(--line); white-space:nowrap; }
+  tbody td{ padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:color-mix(in srgb, var(--text) 4%, transparent); }
+  .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+
+  .badge{ font-size:.68rem; font-weight:700; letter-spacing:.03em; padding:4px 10px; border-radius:100px; white-space:nowrap; }
+  .badge.lost{ background:rgba(200,49,61,.12); color:#E68A92; }
+  .badge.found{ background:rgba(27,115,64,.14); color:#7FCE9A; }
+  .badge.pending{ background:rgba(201,154,46,.16); color:var(--gold); }
+  .badge.org{ background:color-mix(in srgb, var(--text) 10%, transparent); color:var(--muted); }
+  .badge.admin{ background:rgba(200,49,61,.14); color:#E68A92; }
+  .badge.blocked{ background:rgba(200,49,61,.16); color:#E68A92; }
+  .badge.active{ background:rgba(27,115,64,.14); color:#7FCE9A; }
+
+  .empty-state{ text-align:center; padding:56px 24px; }
+  .empty-state .e-icon{ width:52px; height:52px; margin:0 auto 16px; border-radius:14px; background:color-mix(in srgb, var(--gold) 14%, transparent); color:var(--gold); display:flex; align-items:center; justify-content:center; }
+  .empty-state h3{ font-family:var(--serif); font-weight:600; font-size:1.05rem; margin:0 0 6px; }
+  .empty-state p{ margin:0; color:var(--muted); font-size:.85rem; max-width:44ch; margin-inline:auto; }
+
+  [role="status"]{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .toast{
+    position:fixed; bottom:22px; right:22px; background:var(--bg-deep); border:1px solid var(--line);
+    border-radius:10px; padding:12px 18px; font-size:.85rem; box-shadow:0 16px 32px rgba(0,0,0,.4);
+    z-index:50; max-width:320px;
+  }
+  .toast.ok{ border-color:rgba(27,115,64,.4); color:#7FCE9A; }
+  .toast.err{ border-color:rgba(200,49,61,.4); color:#E68A92; }
+
+  /* ---- Modale simple actualité ---- */
+  dialog{ border:none; border-radius:16px; padding:0; background:var(--paper); color:var(--ink); max-width:520px; width:92vw; }
+  dialog::backdrop{ background:rgba(0,0,0,.55); }
+  .modal-body{ padding:26px; }
+  .modal-body h3{ font-family:var(--serif); margin:0 0 16px; }
+  .modal-body .field{ margin-bottom:14px; }
+  .modal-body label{ display:block; font-size:.78rem; font-weight:600; color:var(--ink-soft); margin-bottom:6px; }
+  .modal-body input, .modal-body textarea{
+    width:100%; border:1.5px solid color-mix(in srgb, var(--ink) 15%, transparent); border-radius:9px;
+    padding:10px 12px; font-family:var(--sans); font-size:.9rem; color:var(--ink);
+  }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:6px; }
+
+  .gate{ display:flex; align-items:center; justify-content:center; min-height:100vh; text-align:center; padding:24px; }
+  .gate-box{ max-width:420px; }
+  .gate-box .e-icon{ width:60px; height:60px; margin:0 auto 20px; border-radius:16px; background:rgba(200,49,61,.14); color:#E68A92; display:flex; align-items:center; justify-content:center; }
+  #loading{ display:flex; align-items:center; justify-content:center; min-height:100vh; color:var(--muted); }
+  #app, #gate{ display:none; }
+
+  @media (max-width:900px){
+    .layout{ grid-template-columns:1fr; }
+    aside.sidebar{ position:fixed; inset:0 auto 0 0; width:250px; transform:translateX(-100%); transition:transform .28s ease; z-index:40; }
+    aside.sidebar.open{ transform:translateX(0); }
+    .sidebar-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:35; display:none; }
+    .sidebar-overlay.open{ display:block; }
+    .content{ padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#mainContent">Aller au contenu principal</a>
+
+<div id="loading">Vérification des droits d'accès…</div>
+
+<div id="gate">
+  <div class="gate">
+    <div class="gate-box">
+      <div class="e-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h1 style="font-family:var(--serif); font-size:1.3rem;">Accès réservé</h1>
+      <p style="color:var(--muted); margin-bottom:22px;">Cette page est réservée aux administrateurs de MY ID CAMEROUN. Connectez-vous avec un compte administrateur pour continuer.</p>
+      <a href="tableau-de-bord.html" class="btn btn-ghost">Retour au tableau de bord</a>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Navigation du panneau admin">
+    <div class="side-brand">
+      <span class="mark"><img src="favicon.png" alt=""></span>
+      <span>MY ID CAMEROUN<small>Panneau Admin</small></span>
+    </div>
+    <nav class="side-nav" aria-label="Sections admin">
+      <button class="side-link" data-section="dashboard" aria-current="page">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Tableau de bord
+      </button>
+      <button class="side-link" data-section="orgas">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        Comptes Organisation <span class="count" id="countOrgas" hidden>0</span>
+      </button>
+      <button class="side-link" data-section="declarations">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Déclarations
+      </button>
+      <button class="side-link" data-section="users">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Utilisateurs
+      </button>
+      <button class="side-link" data-section="reports">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V3"/><path d="M4 4h14l-2 4 2 4H4"/></svg>
+        Signalements <span class="count" id="countReports" hidden>0</span>
+      </button>
+      <button class="side-link" data-section="news">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>
+        Actualités
+      </button>
+    </nav>
+    <div class="side-foot">
+      <button class="icon-btn" id="themeBtn" title="Changer de thème" style="align-self:flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 4.9l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.9 19.1l1.4-1.4"/><path d="M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a href="tableau-de-bord.html" class="btn btn-ghost btn-sm">← Retour au site</a>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Déconnexion</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <button class="icon-btn" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="sidebar" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+      </button>
+      <div>
+        <h1 id="topTitle">Tableau de bord</h1>
+        <p class="sub" id="topSub">Vue d'ensemble de la plateforme</p>
+      </div>
+      <div class="head-actions">
+        <span id="headAvatar"></span>
+      </div>
+    </div>
+
+    <div class="content" id="mainContent">
+      <div role="status" id="liveStatus"></div>
+
+      <!-- ============ TABLEAU DE BORD ============ -->
+      <section class="panel-section active" id="section-dashboard" aria-labelledby="h-dashboard">
+        <div class="section-head">
+          <h2 id="h-dashboard">Vue d'ensemble</h2>
+          <p>Chiffres clés de la plateforme, en temps réel.</p>
+        </div>
+        <div class="stat-grid" id="statGrid">
+          <div class="stat-box"><b>—</b><span>Déclarations totales</span></div>
+          <div class="stat-box"><b>—</b><span>En attente</span></div>
+          <div class="stat-box"><b>—</b><span>Retrouvées</span></div>
+          <div class="stat-box warn"><b>—</b><span>Comptes Organisation en attente</span></div>
+          <div class="stat-box"><b>—</b><span>Nouveaux comptes (7 jours)</span></div>
+          <div class="stat-box warn"><b>—</b><span>Signalements ouverts</span></div>
+        </div>
+        <div class="empty-state" id="dashEmpty">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
+          <h3>Statistiques indisponibles</h3>
+          <p>Connectez Supabase pour afficher les chiffres réels de la plateforme.</p>
+        </div>
+      </section>
+
+      <!-- ============ COMPTES ORGANISATION ============ -->
+      <section class="panel-section" id="section-orgas" aria-labelledby="h-orgas">
+        <div class="section-head">
+          <h2 id="h-orgas">Comptes Organisation en attente</h2>
+          <p>Valide ou rejette les demandes d'inscription des entités (entreprises, agences, commissariats…).</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Liste des comptes Organisation nécessitant une validation manuelle.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Organisation</th>
+                <th scope="col">Type</th>
+                <th scope="col">RC / NIU</th>
+                <th scope="col">Email</th>
+                <th scope="col">Demandé le</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orgasBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="orgasEmpty" style="display:none;">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>Aucune demande en attente</h3>
+          <p>Toutes les organisations inscrites ont été traitées.</p>
+        </div>
+      </section>
+
+      <!-- ============ DECLARATIONS ============ -->
+      <section class="panel-section" id="section-declarations" aria-labelledby="h-declarations">
+        <div class="section-head">
+          <h2 id="h-declarations">Déclarations du registre</h2>
+          <p>Toutes les pièces perdues ou trouvées signalées par les citoyens et organisations.</p>
+        </div>
+        <form class="filters" id="declFilters">
+          <label>Recherche
+            <input type="text" id="fSearch" placeholder="Nom sur la pièce">
+          </label>
+          <label>Statut
+            <select id="fStatut">
+              <option value="">Tous</option>
+              <option value="en_attente">En attente</option>
+              <option value="retrouve">Retrouvé</option>
+              <option value="archive">Archivé</option>
+            </select>
+          </label>
+          <label>Type
+            <select id="fType">
+              <option value="">Tous</option>
+              <option value="perte">Perte</option>
+              <option value="trouve">Trouvé</option>
+            </select>
+          </label>
+          <label>Région
+            <select id="fRegion">
+              <option value="">Toutes</option>
+              <option>Adamaoua</option><option>Centre</option><option>Est</option>
+              <option>Extrême-Nord</option><option>Littoral</option><option>Nord</option>
+              <option>Nord-Ouest</option><option>Ouest</option><option>Sud</option><option>Sud-Ouest</option>
+            </select>
+          </label>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <caption>Déclarations correspondant aux filtres ci-dessus.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Document</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Localisation</th>
+                <th scope="col">Statut</th>
+                <th scope="col">Date</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="declBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="declEmpty" style="display:none;">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <h3>Aucune déclaration à afficher</h3>
+          <p>Aucun résultat pour ces filtres, ou le registre est vide pour le moment.</p>
+        </div>
+      </section>
+
+      <!-- ============ UTILISATEURS ============ -->
+      <section class="panel-section" id="section-users" aria-labelledby="h-users">
+        <div class="section-head">
+          <h2 id="h-users">Utilisateurs</h2>
+          <p>Comptes Citoyen et Organisation enregistrés sur la plateforme.</p>
+        </div>
+        <form class="filters" id="userFilters">
+          <label>Rechercher par email
+            <input type="text" id="uSearch" placeholder="nom@exemple.com">
+          </label>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <caption>Liste des comptes enregistrés.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Rôle</th>
+                <th scope="col">Statut</th>
+                <th scope="col">Inscrit le</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="usersEmpty" style="display:none;">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <h3>Aucun utilisateur trouvé</h3>
+          <p>Essayez une autre recherche, ou aucun compte n'existe encore.</p>
+        </div>
+      </section>
+
+      <!-- ============ SIGNALEMENTS ============ -->
+      <section class="panel-section" id="section-reports" aria-labelledby="h-reports">
+        <div class="section-head">
+          <h2 id="h-reports">Signalements</h2>
+          <p>Déclarations signalées comme suspectes ou abusives par des citoyens.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Signalements en attente de traitement.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Déclaration concernée</th>
+                <th scope="col">Motif</th>
+                <th scope="col">Signalé par</th>
+                <th scope="col">Date</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="reportsEmpty" style="display:none;">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>Aucun signalement</h3>
+          <p>Aucun abus n'a été signalé pour le moment — tout est en ordre.</p>
+        </div>
+      </section>
+
+      <!-- ============ ACTUALITES ============ -->
+      <section class="panel-section" id="section-news" aria-labelledby="h-news">
+        <div class="section-head" style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div>
+            <h2 id="h-news">Actualités</h2>
+            <p>Articles publiés sur la page publique Actualités du site.</p>
+          </div>
+          <button class="btn btn-gold" id="newArticleBtn">+ Nouvel article</button>
+        </div>
+        <div id="newsList"></div>
+        <div class="empty-state" id="newsEmpty" style="display:none;">
+          <div class="e-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg></div>
+          <h3>Aucun article publié</h3>
+          <p>Créez le premier article pour la page Actualités.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</div>
+
+<dialog id="articleDialog">
+  <form class="modal-body" id="articleForm">
+    <h3 id="dialogTitle">Nouvel article</h3>
+    <div class="field">
+      <label for="artTitre">Titre</label>
+      <input type="text" id="artTitre" required>
+    </div>
+    <div class="field">
+      <label for="artImage">URL de l'image (optionnel)</label>
+      <input type="url" id="artImage" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label for="artTexte">Contenu</label>
+      <textarea id="artTexte" rows="5" required></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost btn-sm" id="cancelArticle">Annuler</button>
+      <button type="submit" class="btn btn-gold btn-sm">Publier</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+  /* ===== FIREBASE : uniquement pour vérifier qui est connecté ===== */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
+    authDomain: "my-id-cameroun-8002f.firebaseapp.com",
+    projectId: "my-id-cameroun-8002f",
+    storageBucket: "my-id-cameroun-8002f.firebasestorage.app",
+    messagingSenderId: "570156621876",
+    appId: "1:570156621876:web:8e9041c95787980fdf2a61",
+    measurementId: "G-49KW835Q2C"
+  };
+  const auth = getAuth(initializeApp(firebaseConfig));
+
+  /* ===== SUPABASE : toutes les données admin (à brancher) ===== */
+  // ⚠️ Remplace ces deux valeurs une fois ton projet Supabase créé.
+  const SUPABASE_URL = "https://iwqebdyftmelslbgdkgq.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3cWViZHlmdG1lbHNsYmdka2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODUwMjQsImV4cCI6MjEwNTI2MTAyNH0.E2LbAUoZ7vngBBLToNoVjDaq82dtFw0Ka_xWOeiCUag";
+  let supabase = null;
+  (async () => {
+    try {
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      if (SUPABASE_URL !== "REMPLACE_MOI"){
+        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(e){ console.warn('Supabase non chargé :', e); }
+  })();
+
+  function announce(text){ document.getElementById('liveStatus').textContent = text; }
+  function toast(text, kind){
+    const t = document.createElement('div');
+    t.className = 'toast ' + (kind || 'ok');
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+  function initials(s){
+    s = (s||'?').trim();
+    const p = s.split(/[\s@._-]+/).filter(Boolean);
+    return ((p[0]?.[0]||'?') + (p[1]?.[0]||'')).toUpperCase();
+  }
+
+  /* ===== Garde d'accès : connecté + rôle admin ===== */
+  onAuthStateChanged(auth, async (user) => {
+    if (!user){ window.location.href = 'connexion.html'; return; }
+
+    const supabaseConfigured = SUPABASE_URL !== "REMPLACE_MOI";
+    let role = null;
+    if (supabase){
+      try {
+        const { data } = await supabase.from('profils').select('role').eq('uid', user.uid).single();
+        role = data?.role || null;
+      } catch(e){ console.warn(e); }
+    }
+
+    document.getElementById('loading').style.display = 'none';
+
+    // Une fois Supabase branché, seul un vrai rôle "admin" peut entrer.
+    if (supabaseConfigured && role !== 'admin'){
+      document.getElementById('gate').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('app').style.display = 'block';
+    if (!supabaseConfigured) showDemoBanner();
+    const photo = user.photoURL || '';
+    document.getElementById('headAvatar').innerHTML = photo
+      ? `<img class="avatar" src="${photo}" alt="">`
+      : `<span class="avatar-fallback">${initials(user.displayName || user.email)}</span>`;
+
+    loadDashboard();
+    loadOrgas();
+  });
+
+  function showDemoBanner(){
+    const b = document.createElement('div');
+    b.setAttribute('role','note');
+    b.style.cssText = 'background:rgba(201,154,46,.14); border-bottom:1px solid rgba(201,154,46,.35); color:var(--gold); font-size:.82rem; padding:10px 20px; text-align:center;';
+    b.textContent = "Mode démonstration — Supabase n'est pas encore connecté. Une fois branché, cette page sera réservée aux comptes avec le rôle « admin ».";
+    document.getElementById('app').prepend(b);
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'index.html';
+  });
+
+  /* ===== Thème clair/sombre ===== */
+  const sunIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.9 4.9l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.9 19.1l1.4-1.4"/><path d="M17.7 6.3l1.4-1.4"/></svg>';
+  const moonIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light');
+    document.getElementById('themeBtn').innerHTML = isLight ? moonIcon : sunIcon;
+  });
+
+  /* ===== Navigation latérale (sections) ===== */
+  const sectionTitles = {
+    dashboard: ["Tableau de bord", "Vue d'ensemble de la plateforme"],
+    orgas: ["Comptes Organisation", "Validation des comptes entreprises et entités"],
+    declarations: ["Déclarations", "Toutes les pièces perdues ou trouvées du registre"],
+    users: ["Utilisateurs", "Comptes Citoyen et Organisation"],
+    reports: ["Signalements", "Abus signalés par les citoyens"],
+    news: ["Actualités", "Articles publiés sur le site"]
+  };
+  document.querySelectorAll('.side-link').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.section;
+      document.querySelectorAll('.side-link').forEach(b => b.removeAttribute('aria-current'));
+      btn.setAttribute('aria-current', 'page');
+      document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('section-' + target).classList.add('active');
+      document.getElementById('topTitle').textContent = sectionTitles[target][0];
+      document.getElementById('topSub').textContent = sectionTitles[target][1];
+      announce(sectionTitles[target][0] + ' affiché');
+      const loaders = { declarations: loadDeclarations, users: loadUsers, reports: loadReports, news: loadNews };
+      if (loaders[target]) loaders[target]();
+      if (window.innerWidth <= 900) closeSidebar();
+      document.getElementById('mainContent').focus?.();
+    });
+  });
+
+  /* ===== Menu mobile ===== */
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const menuToggle = document.getElementById('menuToggle');
+  function openSidebar(){ sidebar.classList.add('open'); overlay.classList.add('open'); menuToggle.setAttribute('aria-expanded','true'); }
+  function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); }
+  function checkMobile(){ menuToggle.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  menuToggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+  overlay.addEventListener('click', closeSidebar);
+
+  /* ===== Chargements de données (Supabase) ===== */
+  async function loadDashboard(){
+    const empty = document.getElementById('dashEmpty');
+    if (!supabase){ empty.style.display = 'block'; return; }
+    try {
+      const [{ count: total }, { count: attente }, { count: retrouve }, { count: orgasAttente }] = await Promise.all([
+        supabase.from('declarations').select('*', { count:'exact', head:true }),
+        supabase.from('declarations').select('*', { count:'exact', head:true }).eq('statut','en_attente'),
+        supabase.from('declarations').select('*', { count:'exact', head:true }).eq('statut','retrouve'),
+        supabase.from('profils').select('*', { count:'exact', head:true }).eq('role','organisation').eq('statutValidation','en_attente'),
+      ]);
+      const boxes = document.querySelectorAll('#statGrid b');
+      boxes[0].textContent = total ?? 0;
+      boxes[1].textContent = attente ?? 0;
+      boxes[2].textContent = retrouve ?? 0;
+      boxes[3].textContent = orgasAttente ?? 0;
+      empty.style.display = 'none';
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+
+  async function loadOrgas(){
+    const body = document.getElementById('orgasBody');
+    const empty = document.getElementById('orgasEmpty');
+    if (!supabase){ empty.style.display = 'block'; body.innerHTML=''; return; }
+    try {
+      const { data, error } = await supabase.from('profils').select('*')
+        .eq('role','organisation').eq('statutValidation','en_attente');
+      if (error) throw error;
+      const countEl = document.getElementById('countOrgas');
+      if (data && data.length){ countEl.hidden = false; countEl.textContent = data.length; } else countEl.hidden = true;
+      if (!data || data.length === 0){ empty.style.display='block'; body.innerHTML=''; return; }
+      empty.style.display = 'none';
+      body.innerHTML = data.map(o => `
+        <tr>
+          <td>${o.nomOrganisation || '—'}</td>
+          <td><span class="badge org">${o.typeOrganisation || '—'}</span></td>
+          <td>${o.rc || '—'} / ${o.niu || '—'}</td>
+          <td>${o.email || '—'}</td>
+          <td>${o.creeLe ? new Date(o.creeLe).toLocaleDateString('fr-FR') : '—'}</td>
+          <td class="row-actions">
+            <button class="btn btn-gold btn-sm" data-validate="${o.uid}">Valider</button>
+            <button class="btn btn-danger btn-sm" data-reject="${o.uid}">Rejeter</button>
+          </td>
+        </tr>`).join('');
+      body.querySelectorAll('[data-validate]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.validate, true)));
+      body.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.reject, false)));
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+  async function validateOrga(uid, accepted){
+    try {
+      await supabase.from('profils').update({ statutValidation: accepted ? 'valide' : 'rejete' }).eq('uid', uid);
+      toast(accepted ? 'Organisation validée.' : 'Demande rejetée.', 'ok');
+      announce(accepted ? 'Organisation validée' : 'Demande rejetée');
+      loadOrgas();
+      loadDashboard();
+    } catch(e){
+      toast("Action impossible pour le moment.", 'err');
+    }
+  }
+
+  async function loadDeclarations(){
+    const body = document.getElementById('declBody');
+    const empty = document.getElementById('declEmpty');
+    if (!supabase){ empty.style.display='block'; body.innerHTML=''; return; }
+    try {
+      let q = supabase.from('declarations').select('*').order('creeLe', { ascending:false }).limit(100);
+      const statut = document.getElementById('fStatut').value;
+      const type = document.getElementById('fType').value;
+      const region = document.getElementById('fRegion').value;
+      const search = document.getElementById('fSearch').value.trim();
+      if (statut) q = q.eq('statut', statut);
+      if (type) q = q.eq('type', type);
+      if (region) q = q.eq('region', region);
+      if (search) q = q.ilike('nom', `%${search}%`);
+      const { data, error } = await q;
+      if (error) throw error;
+      if (!data || data.length === 0){ empty.style.display='block'; body.innerHTML=''; return; }
+      empty.style.display = 'none';
+      body.innerHTML = data.map(d => `
+        <tr>
+          <td><span class="badge ${d.type==='trouve'?'found':'lost'}">${d.type==='trouve'?'TROUVÉ':'PERTE'}</span></td>
+          <td>${d.documentType||'—'}</td>
+          <td>${d.nom||'—'}</td>
+          <td>${[d.ville,d.region].filter(Boolean).join(', ')||'—'}</td>
+          <td>
+            <select data-statut="${d.id}" aria-label="Changer le statut de la déclaration de ${d.nom||'ce document'}">
+              <option value="en_attente" ${d.statut==='en_attente'?'selected':''}>En attente</option>
+              <option value="retrouve" ${d.statut==='retrouve'?'selected':''}>Retrouvé</option>
+              <option value="archive" ${d.statut==='archive'?'selected':''}>Archivé</option>
+            </select>
+          </td>
+          <td>${d.creeLe ? new Date(d.creeLe).toLocaleDateString('fr-FR') : '—'}</td>
+          <td class="row-actions"><button class="btn btn-danger btn-sm" data-del="${d.id}">Supprimer</button></td>
+        </tr>`).join('');
+      body.querySelectorAll('[data-statut]').forEach(sel => sel.addEventListener('change', async () => {
+        try { await supabase.from('declarations').update({ statut: sel.value }).eq('id', sel.dataset.statut);
+          toast('Statut mis à jour.', 'ok'); announce('Statut mis à jour'); }
+        catch(e){ toast('Impossible de mettre à jour.', 'err'); }
+      }));
+      body.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement cette déclaration ?')) return;
+        try { await supabase.from('declarations').delete().eq('id', btn.dataset.del);
+          toast('Déclaration supprimée.', 'ok'); loadDeclarations(); }
+        catch(e){ toast('Suppression impossible.', 'err'); }
+      }));
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+  document.getElementById('declFilters').addEventListener('submit', e => e.preventDefault());
+  ['fStatut','fType','fRegion'].forEach(id => document.getElementById(id).addEventListener('change', loadDeclarations));
+  document.getElementById('fSearch').addEventListener('input', () => {
+    clearTimeout(window.__searchDebounce);
+    window.__searchDebounce = setTimeout(loadDeclarations, 350);
+  });
+
+  async function loadUsers(){
+    const body = document.getElementById('usersBody');
+    const empty = document.getElementById('usersEmpty');
+    if (!supabase){ empty.style.display='block'; body.innerHTML=''; return; }
+    try {
+      let q = supabase.from('profils').select('*').order('creeLe', { ascending:false }).limit(100);
+      const search = document.getElementById('uSearch').value.trim();
+      if (search) q = q.ilike('email', `%${search}%`);
+      const { data, error } = await q;
+      if (error) throw error;
+      if (!data || data.length === 0){ empty.style.display='block'; body.innerHTML=''; return; }
+      empty.style.display = 'none';
+      body.innerHTML = data.map(u => `
+        <tr>
+          <td>${u.email||'—'}</td>
+          <td>${u.nom||u.nomOrganisation||'—'}</td>
+          <td><span class="badge ${u.role==='admin'?'admin':'org'}">${(u.role||'citoyen').toUpperCase()}</span></td>
+          <td><span class="badge ${u.bloque?'blocked':'active'}">${u.bloque?'BLOQUÉ':'ACTIF'}</span></td>
+          <td>${u.creeLe ? new Date(u.creeLe).toLocaleDateString('fr-FR') : '—'}</td>
+          <td class="row-actions">
+            <button class="btn btn-sm ${u.bloque?'btn-gold':'btn-danger'}" data-toggle="${u.uid}" data-blocked="${!!u.bloque}">
+              ${u.bloque ? 'Débloquer' : 'Bloquer'}
+            </button>
+          </td>
+        </tr>`).join('');
+      body.querySelectorAll('[data-toggle]').forEach(btn => btn.addEventListener('click', async () => {
+        const nowBlocked = btn.dataset.blocked !== 'true';
+        try {
+          await supabase.from('profils').update({ bloque: nowBlocked }).eq('uid', btn.dataset.toggle);
+          toast(nowBlocked ? 'Compte bloqué.' : 'Compte débloqué.', 'ok');
+          loadUsers();
+        } catch(e){ toast('Action impossible.', 'err'); }
+      }));
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+  document.getElementById('userFilters').addEventListener('submit', e => e.preventDefault());
+  document.getElementById('uSearch').addEventListener('input', () => {
+    clearTimeout(window.__userSearchDebounce);
+    window.__userSearchDebounce = setTimeout(loadUsers, 350);
+  });
+
+  async function loadReports(){
+    const body = document.getElementById('reportsBody');
+    const empty = document.getElementById('reportsEmpty');
+    if (!supabase){ empty.style.display='block'; body.innerHTML=''; return; }
+    try {
+      const { data, error } = await supabase.from('signalements').select('*').order('creeLe', { ascending:false });
+      if (error) throw error;
+      const countEl = document.getElementById('countReports');
+      if (data && data.length){ countEl.hidden = false; countEl.textContent = data.length; } else countEl.hidden = true;
+      if (!data || data.length === 0){ empty.style.display='block'; body.innerHTML=''; return; }
+      empty.style.display = 'none';
+      body.innerHTML = data.map(r => `
+        <tr>
+          <td>${r.declarationNom || r.declaration_id || '—'}</td>
+          <td>${r.motif || '—'}</td>
+          <td>${r.signalePar || '—'}</td>
+          <td>${r.creeLe ? new Date(r.creeLe).toLocaleDateString('fr-FR') : '—'}</td>
+          <td class="row-actions">
+            <button class="btn btn-danger btn-sm" data-archive="${r.declaration_id}" data-report="${r.id}">Archiver la déclaration</button>
+            <button class="btn btn-ghost btn-sm" data-ignore="${r.id}">Ignorer</button>
+          </td>
+        </tr>`).join('');
+      body.querySelectorAll('[data-archive]').forEach(btn => btn.addEventListener('click', async () => {
+        try {
+          await supabase.from('declarations').update({ statut:'archive' }).eq('id', btn.dataset.archive);
+          await supabase.from('signalements').delete().eq('id', btn.dataset.report);
+          toast('Déclaration archivée.', 'ok'); loadReports();
+        } catch(e){ toast('Action impossible.', 'err'); }
+      }));
+      body.querySelectorAll('[data-ignore]').forEach(btn => btn.addEventListener('click', async () => {
+        try { await supabase.from('signalements').delete().eq('id', btn.dataset.ignore);
+          toast('Signalement ignoré.', 'ok'); loadReports(); }
+        catch(e){ toast('Action impossible.', 'err'); }
+      }));
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+
+  async function loadNews(){
+    const list = document.getElementById('newsList');
+    const empty = document.getElementById('newsEmpty');
+    if (!supabase){ empty.style.display='block'; list.innerHTML=''; return; }
+    try {
+      const { data, error } = await supabase.from('actualites').select('*').order('creeLe', { ascending:false });
+      if (error) throw error;
+      if (!data || data.length === 0){ empty.style.display='block'; list.innerHTML=''; return; }
+      empty.style.display = 'none';
+      list.innerHTML = data.map(a => `
+        <div class="list-card" style="display:flex; gap:14px; align-items:center; background:var(--bg-deep); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:10px;">
+          <div style="flex:1; min-width:0;">
+            <b style="display:block;">${a.titre||'Sans titre'}</b>
+            <span style="font-size:.8rem; color:var(--muted);">${a.creeLe ? new Date(a.creeLe).toLocaleDateString('fr-FR') : ''}</span>
+          </div>
+          <button class="btn btn-danger btn-sm" data-delart="${a.id}">Supprimer</button>
+        </div>`).join('');
+      list.querySelectorAll('[data-delart]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer cet article ?')) return;
+        try { await supabase.from('actualites').delete().eq('id', btn.dataset.delart);
+          toast('Article supprimé.', 'ok'); loadNews(); }
+        catch(e){ toast('Suppression impossible.', 'err'); }
+      }));
+    } catch(e){
+      console.warn(e);
+      empty.style.display = 'block';
+    }
+  }
+
+  const dialog = document.getElementById('articleDialog');
+  document.getElementById('newArticleBtn').addEventListener('click', () => dialog.showModal());
+  document.getElementById('cancelArticle').addEventListener('click', () => dialog.close());
+  document.getElementById('articleForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!supabase){ toast("Supabase n'est pas encore connecté.", 'err'); return; }
+    try {
+      await supabase.from('actualites').insert({
+        titre: document.getElementById('artTitre').value.trim(),
+        image: document.getElementById('artImage').value.trim(),
+        texte: document.getElementById('artTexte').value.trim(),
+        creeLe: new Date().toISOString()
+      });
+      toast('Article publié.', 'ok');
+      document.getElementById('articleForm').reset();
+      dialog.close();
+      loadNews();
+    } catch(e){
+      toast("Impossible de publier l'article.", 'err');
+    }
+  });
+</script>
+</body>
+</html>
