@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://esm.sh" crossorigin>
+<link rel="preconnect" href="https://api.emailjs.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -458,6 +459,7 @@
     sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?bundle";
+  import emailjs from "https://esm.sh/@emailjs/browser@4?bundle";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
@@ -476,6 +478,8 @@
     "https://iwqebdyftmelslbgdkgq.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3cWViZHlmdG1lbHNsYmdka2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODUwMjQsImV4cCI6MjEwNTI2MTAyNH0.E2LbAUoZ7vngBBLToNoVjDaq82dtFw0Ka_xWOeiCUag"
   );
+
+  emailjs.init({ publicKey: "b1FiU2dX42MRGVVUl" });
 
   // Crée le profil de l'utilisateur s'il n'existe pas encore (table Supabase "profils")
   async function ensureProfile(user, extra){
@@ -623,6 +627,16 @@
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       await ensureProfile(cred.user, extra);
       await sendEmailVerification(cred.user);
+      if (isOrg){
+        emailjs.send('service_efrh2vg', 'y1lotpw', {
+          nom_organisation: extra.nomOrganisation || '(non renseigné)',
+          type_organisation: extra.typeOrganisation || '',
+          email: email,
+          telephone: extra.telephone || '',
+          rc: extra.rc || '',
+          niu: extra.niu || ''
+        }).catch(err => console.warn('Notification admin non envoyée :', err));
+      }
       showKey('created', email, 'success');
       document.getElementById('formSignup').reset();
       updateAccountTypeUI();
