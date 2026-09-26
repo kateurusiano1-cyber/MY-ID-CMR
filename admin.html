@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://esm.sh" crossorigin>
+<link rel="preconnect" href="https://api.emailjs.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -506,6 +507,10 @@
   /* ===== FIREBASE : uniquement pour vérifier qui est connecté ===== */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import emailjs from "https://esm.sh/@emailjs/browser@4?bundle";
+  emailjs.init({ publicKey: "b1FiU2dX42MRGVVUl" });
+  // ⚠️ Remplace par le Template ID du modèle "résultat de validation" une fois créé sur EmailJS.
+  const EMAILJS_TEMPLATE_VALIDATION = "template_acxekdc";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD2ph_0elE9oXOHcwT_S6zmZD1wDel0k7o",
@@ -680,22 +685,32 @@
           <td>${o.email || '—'}</td>
           <td>${o.creeLe ? new Date(o.creeLe).toLocaleDateString('fr-FR') : '—'}</td>
           <td class="row-actions">
-            <button class="btn btn-gold btn-sm" data-validate="${o.uid}">Valider</button>
-            <button class="btn btn-danger btn-sm" data-reject="${o.uid}">Rejeter</button>
+            <button class="btn btn-gold btn-sm" data-validate="${o.uid}" data-email="${o.email||''}" data-nom="${o.nomOrganisation||''}">Valider</button>
+            <button class="btn btn-danger btn-sm" data-reject="${o.uid}" data-email="${o.email||''}" data-nom="${o.nomOrganisation||''}">Rejeter</button>
           </td>
         </tr>`).join('');
-      body.querySelectorAll('[data-validate]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.validate, true)));
-      body.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.reject, false)));
+      body.querySelectorAll('[data-validate]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.validate, true, b.dataset.email, b.dataset.nom)));
+      body.querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => validateOrga(b.dataset.reject, false, b.dataset.email, b.dataset.nom)));
     } catch(e){
       console.warn(e);
       empty.style.display = 'block';
     }
   }
-  async function validateOrga(uid, accepted){
+  async function validateOrga(uid, accepted, orgEmail, orgNom){
     try {
       await supabase.from('profils').update({ statutValidation: accepted ? 'valide' : 'rejete' }).eq('uid', uid);
       toast(accepted ? 'Organisation validée.' : 'Demande rejetée.', 'ok');
       announce(accepted ? 'Organisation validée' : 'Demande rejetée');
+      if (orgEmail && EMAILJS_TEMPLATE_VALIDATION !== "REMPLACE_MOI"){
+        emailjs.send('service_efrh2vg', EMAILJS_TEMPLATE_VALIDATION, {
+          email: orgEmail,
+          nom_organisation: orgNom || '',
+          statut: accepted ? 'validée ✅' : 'rejetée ❌',
+          message_supplementaire: accepted
+            ? "Vous pouvez désormais vous connecter et déclarer des documents trouvés."
+            : "Pour toute question, vous pouvez répondre directement à cet email."
+        }).catch(err => console.warn('Email de résultat non envoyé :', err));
+      }
       loadOrgas();
       loadDashboard();
     } catch(e){
